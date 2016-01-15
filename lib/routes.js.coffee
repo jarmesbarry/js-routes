@@ -319,6 +319,7 @@ createGlobalJsRoutesObject = ->
   namespace(root, "NAMESPACE")
   root.NAMESPACE = ROUTES
   root.NAMESPACE.options = defaults
+  root.NAMESPACE.verbMap = VERB_MAP
   root.NAMESPACE.default_serializer = (object, prefix) ->
     Utils.default_serializer(object, prefix)
   root.NAMESPACE

@@ -96,9 +96,13 @@ class JsRoutes
 
   def initialize(options = {})
     @options = self.class.options.to_hash.merge(options)
+    @verb_map = Hash.new
   end
 
   def generate
+    routes_text = js_routes
+    map_text = ''
+    @verb_map.each { |k,v| map_text += "\"#{k}\": \"#{v}\"," }
     {
       "GEM_VERSION"         => JsRoutes::VERSION,
       "APP_CLASS"           => Rails.application.class.to_s,
@@ -107,7 +111,8 @@ class JsRoutes
       "PREFIX"              => @options[:prefix] || "",
       "NODE_TYPES"          => json(NODE_TYPES),
       "SERIALIZER"          => @options[:serializer] || "null",
-      "ROUTES"              => js_routes,
+      "ROUTES"              => routes_text,
+      "VERB_MAP"            => "{#{map_text}}",
     }.inject(File.read(File.dirname(__FILE__) + "/routes.js")) do |js, (key, value)|
       js.gsub!(key, value)
     end
@@ -194,6 +199,7 @@ class JsRoutes
     parent_spec = parent_route.try(:path).try(:spec)
     route_arguments = route_js_arguments(route, parent_spec)
     url_link = generate_url_link(name, route_name, route_arguments, route)
+    @verb_map[route_name] = /[[:upper:]]+/.match(route.verb.to_s)
     _ = <<-JS.strip!
   // #{name.join('.')} => #{parent_spec}#{route.path.spec}
   // function(#{build_params(route.required_parts)})
