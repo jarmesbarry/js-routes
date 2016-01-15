@@ -23,7 +23,7 @@ sudo: false
 
 notifications:
   email:
-    - agresso@gmail.com
+    - jim.d.barry@gmail.com
 
 branches:
   only:
